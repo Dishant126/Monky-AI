@@ -14,6 +14,12 @@ import { ThemeProvider } from "@/lib/theme-context"
 import IntroWrapper from "@/components/intro/intro-wrapper"
 import LayoutContent from "@/components/layout-content"
 import { Toaster } from "@/components/ui/toaster"
+import dynamic from 'next/dynamic'
+
+const VoiceAssistantFixed = dynamic(
+  () => import('@/components/voice-assistant/voice-assistant-fixed'),
+  { ssr: false }
+)
 
 const mockData = mockDataJson as MockData
 
@@ -64,6 +70,9 @@ export default function RootLayout({
 
                     {/* Toaster for notifications */}
                     <Toaster />
+                    
+                    {/* Voice Assistant Floating Button */}
+                    <VoiceAssistantFixed />
                   </SidebarProvider>
                 </FlowchartProvider>
               </V0Provider>

@@ -96,21 +96,17 @@ const data = {
           url: "/project-lab",
           icon: BeakerIcon,
         },
-        {
-          title: "Voice Assistant", // Added Voice Assistant link to Programming section
-          url: "/voice-assistant",
-          icon: Mic,
-        },
-        {
-          title: "Error History",
-          url: "/error-history",
-          icon: BoomIcon,
-        },
-        {
-          title: "Debug History",
-          url: "/debug-history",
-          icon: BoomIcon,
-        },
+
+        // {
+        //   title: "Error History",
+        //   url: "/error-history",
+        //   icon: BoomIcon,
+        // },
+        // {
+        //   title: "Debug History",
+        //   url: "/debug-history",
+        //   icon: BoomIcon,
+        // },
         {
           title: "Workspace",
           url: "/workspace",
