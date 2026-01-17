@@ -91,11 +91,7 @@ const data = {
           url: "/sandbox",
           icon: EmailIcon,
         },
-        {
-          title: "Project Lab", // Added Project Lab to Programming section
-          url: "/project-lab",
-          icon: BeakerIcon,
-        },
+     
 
         // {
         //   title: "Error History",
@@ -122,15 +118,21 @@ const data = {
           url: "/typing-trainer",
           icon: KeyboardIcon,
         },
-        {
-          title: "Learning Hub",
-          url: "/learning-hub",
-          icon: AtomIcon,
-        },
+       
         {
           title: "Skills Hub",
           url: "/skills-hub",
           icon: BoomIcon,
+        },
+           {
+          title: "Project Lab", // Added Project Lab to Programming section
+          url: "/project-lab",
+          icon: BeakerIcon,
+        },
+         {
+          title: "Learning Hub",
+          url: "/learning-hub",
+          icon: AtomIcon,
         },
         {
           title: "Roadmap Generator",
