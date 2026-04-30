@@ -1,20 +1,22 @@
-import { Badge } from "@/components/ui/badge"
-import DashboardCard from "@/components/dashboard/card"
-import Image from "next/image"
-import { cn } from "@/lib/utils"
+import { Badge } from "@/components/ui/badge";
+import DashboardCard from "@/components/dashboard/card";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 interface CodeTutorUser {
-  id: number
-  name: string
-  handle: string
-  points: number
-  avatar: string
-  featured?: boolean
-  streak: string
+  id: number;
+  name: string;
+  handle: string;
+  points: number;
+  avatar: string;
+  featured?: boolean;
+  streak: string;
+  languages?: number;
+  bugs?: number;
 }
 
 interface CodeTutorRankingProps {
-  users: CodeTutorUser[]
+  users: CodeTutorUser[];
 }
 
 export default function CodeTutorRanking({ users }: CodeTutorRankingProps) {
@@ -66,15 +68,30 @@ export default function CodeTutorRanking({ users }: CodeTutorRankingProps) {
                   <div className="flex items-center justify-between">
                     <div className="flex items-baseline gap-2">
                       <span
-                        className={cn("font-display", user.featured ? "text-xl md:text-2xl" : "text-lg md:text-xl")}
+                        className={cn(
+                          "font-display",
+                          user.featured
+                            ? "text-xl md:text-2xl"
+                            : "text-lg md:text-xl",
+                        )}
                       >
                         {user.name}
                       </span>
-                      <span className="text-muted-foreground text-xs md:text-sm">{user.handle}</span>
+                      <span className="text-muted-foreground text-xs md:text-sm">
+                        {user.handle}
+                      </span>
                     </div>
-                    <Badge variant={user.featured ? "default" : "secondary"}>{user.points} BUGS FIXED</Badge>
+                    <Badge variant={user.featured ? "default" : "secondary"}>
+                      {user.languages && user.languages > 0
+                        ? `${user.languages} LANGUAGES`
+                        : user.bugs !== undefined
+                          ? `${user.bugs} BUGS FIXED`
+                          : `${user.points} POINTS`}
+                    </Badge>
                   </div>
-                  <span className="text-sm text-muted-foreground italic">{user.streak}</span>
+                  <span className="text-sm text-muted-foreground italic">
+                    {user.streak}
+                  </span>
                 </div>
               </div>
             </div>
@@ -82,5 +99,5 @@ export default function CodeTutorRanking({ users }: CodeTutorRankingProps) {
         ))}
       </div>
     </DashboardCard>
-  )
+  );
 }

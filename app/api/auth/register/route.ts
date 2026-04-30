@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import dbConnect from '@/lib/db'
 import User from '@/lib/models/User'
 import jwt from 'jsonwebtoken'
+import { getRandomAvatar } from '@/lib/constants/avatars'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
 
@@ -32,6 +33,7 @@ export async function POST(request: NextRequest) {
       name,
       email: email.toLowerCase(),
       password,
+      avatar: getRandomAvatar(),
     })
 
     await user.save()

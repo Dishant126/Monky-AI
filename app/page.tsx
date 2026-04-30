@@ -1,51 +1,28 @@
-import DashboardPageLayout from "@/components/dashboard/layout"
-import DashboardStat from "@/components/dashboard/stat"
-import CodeTutorRanking from "@/components/codetutor/codetutor-ranking"
-import DashboardChart from "@/components/dashboard/chart"
-import ProcessorIcon from "@/components/icons/proccesor"
-import GearIcon from "@/components/icons/gear"
-import BoomIcon from "@/components/icons/boom"
-import AtomIcon from "@/components/icons/atom"
-import { Bullet } from "@/components/ui/bullet"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import DashboardPageLayout from "@/components/dashboard/layout";
+import DashboardStat from "@/components/dashboard/stat";
+import CodeTutorRanking from "@/components/codetutor/codetutor-ranking";
+import DashboardChart from "@/components/dashboard/chart";
+import ProcessorIcon from "@/components/icons/proccesor";
+import GearIcon from "@/components/icons/gear";
+import BoomIcon from "@/components/icons/boom";
+import AtomIcon from "@/components/icons/atom";
+import { Bullet } from "@/components/ui/bullet";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { getDashboardData } from "@/lib/dashboard-data";
 
-const TOP_DEBUG_MASTERS = [
-  {
-    id: 1,
-    name: "KRIMSON",
-    handle: "@KRIMSON",
-    points: 187,
-    avatar: "/avatars/user_krimson.png",
-    featured: true,
-    streak: "5 DAYS STREAK 🔥 Bugs: 47",
-  },
-  {
-    id: 2,
-    name: "MATI",
-    handle: "@MATI",
-    points: 156,
-    avatar: "/avatars/user_mati.png",
-    streak: "3 DAYS STREAK - Bugs: 39",
-  },
-  {
-    id: 3,
-    name: "PEK",
-    handle: "@MATT",
-    points: 124,
-    avatar: "/avatars/user_pek.png",
-    streak: "2 DAYS STREAK - Bugs: 31",
-  },
-  {
-    id: 4,
-    name: "JOYBOY",
-    handle: "@JOYBOY",
-    points: 98,
-    avatar: "/avatars/user_joyboy.png",
-    streak: "1 DAY STREAK - Bugs: 24",
-  },
-]
+const statConfigs = [
+  { label: "BUGS FIXED", icon: GearIcon },
+  { label: "CODE QUALITY", icon: AtomIcon },
+  { label: "LEARNING STREAK", icon: ProcessorIcon },
+  { label: "LANGUAGES MASTERED", icon: BoomIcon },
+];
 
-export default function CodeTutorDashboard() {
+export default async function CodeTutorDashboard() {
+  const dashboardData = await getDashboardData();
+  const statsByLabel = new Map(
+    dashboardData.mockData.dashboardStats.map((stat) => [stat.label, stat]),
+  );
+
   return (
     <DashboardPageLayout
       header={{
@@ -55,45 +32,26 @@ export default function CodeTutorDashboard() {
       }}
     >
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <DashboardStat
-          label="BUGS FIXED"
-          value="324"
-          description="THIS MONTH"
-          icon={GearIcon}
-          tag="🐛 SOLVED"
-          intent="positive"
-          direction="up"
-        />
-        <DashboardStat
-          label="CODE QUALITY"
-          value="94%"
-          description="IMPROVEMENT SCORE"
-          icon={AtomIcon}
-          tag="EXCELLENT"
-          intent="positive"
-          direction="up"
-        />
-        <DashboardStat
-          label="LEARNING STREAK"
-          value="12"
-          description="DAYS CONSECUTIVE"
-          icon={ProcessorIcon}
-          tag="🔥 HOT"
-          intent="positive"
-          direction="up"
-        />
-        <DashboardStat
-          label="LANGUAGES MASTERED"
-          value="6"
-          description="PROFICIENCY LEVEL"
-          icon={BoomIcon}
-          intent="positive"
-          direction="up"
-        />
+        {statConfigs.map(({ label, icon }) => {
+          const stat = statsByLabel.get(label);
+
+          return (
+            <DashboardStat
+              key={label}
+              label={label}
+              value={stat?.value ?? "0"}
+              description={stat?.description ?? ""}
+              icon={icon}
+              tag={stat?.tag}
+              intent={stat?.intent ?? "positive"}
+              direction={stat?.direction}
+            />
+          );
+        })}
       </div>
 
       <div className="mb-6">
-        <DashboardChart />
+        <DashboardChart chartData={dashboardData.mockData.chartData} />
       </div>
 
       <div className="mb-6">
@@ -107,26 +65,44 @@ export default function CodeTutorDashboard() {
           <CardContent className="bg-accent">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="p-4 bg-background border border-pop rounded">
-                <p className="text-xs text-foreground/60 mb-2 uppercase">Most Fixed Errors</p>
-                <p className="text-lg font-bold">Undefined References</p>
-                <p className="text-xs text-foreground/50 mt-1">58 fixes this week</p>
+                <p className="text-xs text-foreground/60 mb-2 uppercase">
+                  Most Fixed Errors
+                </p>
+                <p className="text-lg font-bold">
+                  {dashboardData.insights.mostFixedErrors}
+                </p>
+                <p className="text-xs text-foreground/50 mt-1">
+                  {dashboardData.insights.mostFixedErrorsCount} fixes this week
+                </p>
               </div>
               <div className="p-4 bg-background border border-pop rounded">
-                <p className="text-xs text-foreground/60 mb-2 uppercase">Top Language</p>
-                <p className="text-lg font-bold">JavaScript</p>
-                <p className="text-xs text-foreground/50 mt-1">126 bugs debugged</p>
+                <p className="text-xs text-foreground/60 mb-2 uppercase">
+                  Top Language
+                </p>
+                <p className="text-lg font-bold">
+                  {dashboardData.insights.topLanguage}
+                </p>
+                <p className="text-xs text-foreground/50 mt-1">
+                  {dashboardData.insights.topLanguageCount} bugs debugged
+                </p>
               </div>
               <div className="p-4 bg-background border border-pop rounded">
-                <p className="text-xs text-foreground/60 mb-2 uppercase">Avg Debug Time</p>
-                <p className="text-lg font-bold">3.2 min</p>
-                <p className="text-xs text-foreground/50 mt-1">20% faster than last week</p>
+                <p className="text-xs text-foreground/60 mb-2 uppercase">
+                  Avg Debug Time
+                </p>
+                <p className="text-lg font-bold">
+                  {dashboardData.insights.avgDebugTime}
+                </p>
+                <p className="text-xs text-foreground/50 mt-1">
+                  Based on saved backend snippets
+                </p>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <CodeTutorRanking users={TOP_DEBUG_MASTERS} />
+      <CodeTutorRanking users={dashboardData.leaderboard} />
     </DashboardPageLayout>
-  )
+  );
 }

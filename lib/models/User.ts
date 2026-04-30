@@ -1,5 +1,6 @@
 import mongoose, { Document, Schema } from 'mongoose'
 import bcrypt from 'bcryptjs'
+import { getRandomAvatar } from '@/lib/constants/avatars'
 
 export interface IUser extends Document {
   name: string
@@ -30,7 +31,7 @@ const UserSchema: Schema = new Schema({
   },
   avatar: {
     type: String,
-    default: '/professional-developer-avatar-blue.jpg',
+    default: getRandomAvatar,
   },
   bio: {
     type: String,
