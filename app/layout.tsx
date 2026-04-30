@@ -1,61 +1,69 @@
-import type React from "react"
-import { Roboto_Mono } from "next/font/google"
-import "./globals.css"
-import type { Metadata } from "next"
-import { V0Provider } from "@/lib/v0-context"
-import { FlowchartProvider } from "@/lib/context/flowchart-context"
-import localFont from "next/font/local"
-import { SidebarProvider } from "@/components/ui/sidebar"
-import { MobileHeader } from "@/components/dashboard/mobile-header"
-import mockDataJson from "@/mock.json"
-import type { MockData } from "@/types/dashboard"
-import { AuthProvider } from "@/lib/auth-context"
-import { ThemeProvider } from "@/lib/theme-context"
-import IntroWrapper from "@/components/intro/intro-wrapper"
-import LayoutContent from "@/components/layout-content"
-import { Toaster } from "@/components/ui/toaster"
-import dynamic from 'next/dynamic'
+import type React from "react";
+import { Roboto_Mono } from "next/font/google";
+import "./globals.css";
+import type { Metadata } from "next";
+import { V0Provider } from "@/lib/v0-context";
+import { FlowchartProvider } from "@/lib/context/flowchart-context";
+import localFont from "next/font/local";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { MobileHeader } from "@/components/dashboard/mobile-header";
+import { AuthProvider } from "@/lib/auth-context";
+import { ThemeProvider } from "@/lib/theme-context";
+import IntroWrapper from "@/components/intro/intro-wrapper";
+import LayoutContent from "@/components/layout-content";
+import { Toaster } from "@/components/ui/toaster";
+import dynamic from "next/dynamic";
+import { getDashboardData } from "@/lib/dashboard-data";
 
 const VoiceAssistantFixed = dynamic(
-  () => import('@/components/voice-assistant/voice-assistant-fixed'),
-  { ssr: false }
-)
-
-const mockData = mockDataJson as MockData
+  () => import("@/components/voice-assistant/voice-assistant-fixed"),
+  { ssr: false },
+);
 
 const robotoMono = Roboto_Mono({
   variable: "--font-roboto-mono",
   subsets: ["latin"],
-})
+});
 
 const rebelGrotesk = localFont({
   src: "../public/fonts/Rebels-Fett.woff2",
   variable: "--font-rebels",
   display: "swap",
-})
+});
 
-const isV0 = process.env["VERCEL_URL"]?.includes("vusercontent.net") ?? false
+const isV0 = process.env["VERCEL_URL"]?.includes("vusercontent.net") ?? false;
 
 export const metadata: Metadata = {
   title: {
     template: "%s – M.O.N.K.Y OS",
     default: "M.O.N.K.Y OS",
   },
-  description: "The ultimate OS for rebels. Making the web for brave individuals.",
+  description:
+    "The ultimate OS for rebels. Making the web for brave individuals.",
   generator: "v0.app",
-}
+};
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
+  const dashboardData = await getDashboardData();
+
   return (
     <html lang="en" className="dark">
       <head>
-        <link rel="preload" href="/fonts/Rebels-Fett.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link
+          rel="preload"
+          href="/fonts/Rebels-Fett.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
       </head>
-      <body className={`${rebelGrotesk.variable} ${robotoMono.variable} antialiased`}>
+      <body
+        className={`${rebelGrotesk.variable} ${robotoMono.variable} antialiased`}
+      >
         <ThemeProvider>
           <AuthProvider>
             <IntroWrapper>
@@ -63,14 +71,16 @@ export default function RootLayout({
                 <FlowchartProvider>
                   <SidebarProvider>
                     {/* Mobile Header - only visible on mobile */}
-                    <MobileHeader mockData={mockData} />
+                    <MobileHeader mockData={dashboardData.mockData} />
 
                     {/* Desktop Layout */}
-                    <LayoutContent mockData={mockData}>{children}</LayoutContent>
+                    <LayoutContent mockData={dashboardData.mockData}>
+                      {children}
+                    </LayoutContent>
 
                     {/* Toaster for notifications */}
                     <Toaster />
-                    
+
                     {/* Voice Assistant Floating Button */}
                     <VoiceAssistantFixed />
                   </SidebarProvider>
@@ -81,5 +91,5 @@ export default function RootLayout({
         </ThemeProvider>
       </body>
     </html>
-  )
+  );
 }

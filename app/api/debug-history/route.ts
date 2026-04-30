@@ -1,56 +1,60 @@
 import { type NextRequest, NextResponse } from "next/server"
+import dbConnect from '@/lib/db'
+import { requireAuth } from '@/lib/auth'
+import DebugHistory from '@/lib/models/DebugHistory'
 
 export async function GET(request: NextRequest) {
   try {
-    const mockHistory = [
-      {
-        id: "1",
-        userId: "demo-user",
-        errorMessage: "TypeError: Cannot read property 'length' of undefined",
-        analysis: "The variable is undefined. You need to check if it exists before accessing properties.",
-        fixedCode: "const arr = [];\nif (arr) {\n  console.log(arr.length);\n}",
-        codeSnippetId: null,
-        createdAt: new Date(Date.now() - 86400000).toISOString(),
-      },
-      {
-        id: "2",
-        userId: "demo-user",
-        errorMessage: "SyntaxError: Unexpected token",
-        analysis: "Missing colon between property name and value in object literal.",
-        fixedCode: "const obj = { name: 'John' };",
-        codeSnippetId: null,
-        createdAt: new Date(Date.now() - 172800000).toISOString(),
-      },
-    ]
+    const user = await requireAuth(request)
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
 
-    return NextResponse.json(mockHistory)
+    await dbConnect()
+
+    const entries = await DebugHistory.find({ userId: user.id }).sort({ createdAt: -1 }).lean()
+
+    return NextResponse.json(entries)
   } catch (error) {
     console.error("[v0] Error fetching debug history:", error)
+    if (error === 'Unauthorized') {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
+    const user = await requireAuth(request)
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
     const { codeSnippetId, errorMessage, analysis, fixedCode } = await request.json()
 
-    if (!errorMessage || !analysis || !fixedCode) {
+    if (!errorMessage || !fixedCode) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
-    const debugEntry = {
-      id: Math.random().toString(36).substr(2, 9),
-      userId: "demo-user",
-      codeSnippetId,
+    await dbConnect()
+
+    const entry = new DebugHistory({
+      userId: user.id,
+      codeSnippetId: codeSnippetId ?? null,
       errorMessage,
       analysis,
       fixedCode,
-      createdAt: new Date().toISOString(),
-    }
+    })
 
-    return NextResponse.json(debugEntry, { status: 201 })
+    await entry.save()
+
+    return NextResponse.json(entry, { status: 201 })
   } catch (error) {
     console.error("[v0] Error creating debug history:", error)
+    if (error === 'Unauthorized') {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
